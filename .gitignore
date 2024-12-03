@@ -1,0 +1,55 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+.env.*
+
+# Build files
+build/
+dist/
+*.egg-info/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Logs and temporary files
+*.log
+*.out
+*.err
+*.pid
+*.gz
+*.zip
+*.tar
+*.tar.gz
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Test and coverage reports
+.tox/
+.nox/
+coverage/
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Mypy type-checking
+.mypy_cache/
+
+# Pyre type-checking
+.pyre/
