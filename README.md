@@ -36,14 +36,14 @@ The project consists of two agents that communicate via message queues. The agen
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/your-repo.git
-   cd your-repo
+   git clone https://github.com/Chandrashekhar-solulab/olas-dev-assignment.git
+   cd olas-dev-assignment
    ```
 
 2. Set up a virtual environment:
 
    ```bash
-   python3 -m venv venv
+   python -m venv venv
    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
    ```
 

@@ -3,7 +3,7 @@ import random
 import time
 from queue import Queue
 from threading import Event
-from blockchain.Blockchain import FROM_ADDRESS, get_token_balance, transfer_token
+from blockchain.blockchain import FROM_ADDRESS, get_token_balance, transfer_token
 from dotenv import load_dotenv
 
 # Load environment variables

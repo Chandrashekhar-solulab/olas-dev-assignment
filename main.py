@@ -1,6 +1,6 @@
 import threading
 import time
-from agent.Agent import agent_1, agent_2
+from agent.agent import agent_1, agent_2
 
 # global stop event
 stop_event = threading.Event()

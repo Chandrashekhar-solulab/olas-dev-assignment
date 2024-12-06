@@ -40,15 +40,15 @@ def get_token_balance(address):
 def transfer_token(target_address):
     try:
         tokens_to_transfer = 1 * 10**DECIMAL
-        transaction = token_contract.functions.transfer(target_address, tokens_to_transfer).build_transaction({
+        rawTransaction = token_contract.functions.transfer(target_address, tokens_to_transfer).build_transaction({
             "from": FROM_ADDRESS,
             "nonce": web3.eth.get_transaction_count(FROM_ADDRESS),
             "gas": GAS,
             "gasPrice": web3.to_wei(GAS_PRICE, "gwei"),
         })
 
-        signed_txn = web3.eth.account.sign_transaction(transaction, private_key=PRIVATE_KEY)
-        tx_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        signed_txn = web3.eth.account.sign_transaction(rawTransaction, private_key=PRIVATE_KEY)
+        tx_hash = web3.eth.send_raw_transaction(signed_txn.raw_transaction)
         
         log_message(f"Simulating transfer of {tokens_to_transfer / 10**DECIMAL} token(s) from {FROM_ADDRESS} to {target_address}")
         log_message(f"Transaction Hash: {web3.to_hex(tx_hash)}")
