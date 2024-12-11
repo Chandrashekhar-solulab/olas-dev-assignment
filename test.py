@@ -1,18 +1,20 @@
+import os
 import unittest
 from unittest.mock import patch
-from queue import Queue
 import threading
 import time
 
-from Agent import agent_1, agent_2, inbox, outbox
-from blockchain import get_token_balance, transfer_token, SOURCE_ADDRESS
+from agent.agent import agent_1, agent_2, inbox, outbox
+from blockchain.blockchain import get_token_balance, transfer_token
+SOURCE_ADDRESS = os.getenv("FROM_ADDRESS")
+
 
 TO_ADDRESS = '0xFa7e2322AE858d58CDb7C4D8e2687c447d08c231'
 
 class TestAgents(unittest.TestCase):
 
-    @patch('Agent.get_token_balance')
-    @patch('Agent.transfer_token')
+    @patch('agent.agent.get_token_balance')
+    @patch('agent.agent.transfer_token')
     def test_agent_1_process_message(self, mock_transfer_token, mock_get_token_balance):
         stop_event = threading.Event()
         
@@ -54,29 +56,64 @@ class TestAgents(unittest.TestCase):
         stop_event.set()
         thread.join()
 
-    @patch('blockchain.token_contract')
+    @patch('blockchain.blockchain.token_contract')
     def test_get_token_balance(self, mock_token_contract):
-        # Mock the balanceOf function call
-        mock_token_contract.functions.balanceOf.return_value.call.return_value = 1000000
+      
+        mock_token_contract.functions.balanceOf.return_value.call.return_value = 10000000
         balance = get_token_balance(SOURCE_ADDRESS)
         mock_token_contract.functions.balanceOf.assert_called_once_with(SOURCE_ADDRESS)
         
-        # Verify the expected output format
-        self.assertEqual(balance, 1)  # Adjusting for token decimals
+     
+        self.assertEqual(balance, 10) 
+    
+    @patch('blockchain.blockchain.web3')  
+    @patch('blockchain.blockchain.token_contract') 
+    def test_transfer_token(self, mock_token_contract, mock_web3):
+        # Mock the decimals method on the token contract
+        mock_token_contract.functions.decimals.return_value.call.return_value = 6  # Example decimal value
 
-    @patch('blockchain.token_contract')
-    @patch('blockchain.web3')
-    def test_transfer_token(self, mock_web3, mock_token_contract):
-        # Mocking nonce and transaction building
-        mock_web3.eth.get_transaction_count.return_value = 1
-        transfer_token(TO_ADDRESS)
+        # Retrieve the decimal dynamically
+        DECIMAL = mock_token_contract.functions.decimals().call()
+        amount = 1 * (10 ** DECIMAL)  # Correct calculation for token amount
+
+        # Mock transaction count and gas price
+        mock_web3.eth.get_transaction_count.return_value = 1  
+        mock_web3.to_wei.return_value = 2000000000  
+
+        # Mock signing the transaction
+        mock_signed_txn = unittest.mock.Mock()
+        mock_signed_txn.raw_transaction = b'signed_txn_data'
+        mock_web3.eth.account.sign_transaction.return_value = mock_signed_txn
+
+        # Mock sending the raw transaction
+        mock_web3.eth.send_raw_transaction.return_value = b'mock_tx_hash'
+
+        # Mock token contract transfer function
+        mock_transfer_func = unittest.mock.Mock()
+        mock_transfer_func.build_transaction.return_value = {
+            "from": SOURCE_ADDRESS,
+            "nonce": 1,
+            "gas": 200000,
+            "gasPrice": 2000000000,
+        }
+        mock_token_contract.functions.transfer.return_value = mock_transfer_func
+
+        # Call the function under test
+        transfer_token(TO_ADDRESS, amount)
+
+        # Assertions for contract call
+        mock_token_contract.functions.transfer.assert_called_once_with(TO_ADDRESS, amount)
+        mock_transfer_func.build_transaction.assert_called_once_with({
+            "from": SOURCE_ADDRESS,
+            "nonce": 1,
+            "gas": 200000,
+            "gasPrice": 2000000000,
+        })
+
+        # Assertions for signing and sending the transaction
+        mock_web3.eth.account.sign_transaction.assert_called_once()
+        mock_web3.eth.send_raw_transaction.assert_called_once_with(b'signed_txn_data')
         
-        # Verify transfer function call with correct arguments
-        mock_token_contract.functions.transferFrom.assert_called_once_with(
-            SOURCE_ADDRESS,TO_ADDRESS, 1 * 10**6
-        )
-
-
     def test_integration_agents_message_flow(self):
         stop_event = threading.Event()
         

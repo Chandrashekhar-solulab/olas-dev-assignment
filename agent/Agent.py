@@ -36,7 +36,7 @@ def agent_1(stop_event):
                 print(f"Message with '{MESSAGE_WORD}' moved to outbox:", message)
             elif CRYPTO_WORD in message:
                 print(f"Triggering token transfer for message containing '{CRYPTO_WORD}'")
-                transfer_token(TARGET_ADDRESS)
+                transfer_token(TARGET_ADDRESS,1*1**6)
 
             outbox.put(message)
 

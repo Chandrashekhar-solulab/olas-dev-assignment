@@ -22,7 +22,7 @@ The project consists of two agents that communicate via message queues. The agen
 ## Project Structure
 
 ```
-├── Agent.py                   # Contains the implementation of Agent 1 and Agent 2
+├── agent.py                   # Contains the implementation of Agent 1 and Agent 2
 ├── blockchain.py              # Interacts with the Ethereum blockchain
 ├── main.py                    # Main execution file to run the agents
 ├── tests.py                   # Unit tests for agent functionality
